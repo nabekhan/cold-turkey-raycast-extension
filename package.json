@@ -1,5 +1,5 @@
 {
-  "$schema": "https://www.raycast.com/schemas/extension.mjson",
+  "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "cold-turkey-blocker",
   "title": "Cold Turkey Blocker",
   "version": "1.1.0",

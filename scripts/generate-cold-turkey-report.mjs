@@ -101,23 +101,23 @@ function usage() {
 Cold Turkey CLI report generator
 
 Read-only report:
-  node scripts/generate-cold-turkey-report.js
+  node scripts/generate-cold-turkey-report.mjs
 
 Read-only + status snapshots:
-  node scripts/generate-cold-turkey-report.js --status-all
-  node scripts/generate-cold-turkey-report.js --status-block "World Wide Web"
+  node scripts/generate-cold-turkey-report.mjs --status-all
+  node scripts/generate-cold-turkey-report.mjs --status-block "World Wide Web"
 
 Lab report using harmless website/app test block:
-  node scripts/generate-cold-turkey-report.js --lab
+  node scripts/generate-cold-turkey-report.mjs --lab
 
 Lab report including device block creation:
-  node scripts/generate-cold-turkey-report.js --lab --include-device-blocks
+  node scripts/generate-cold-turkey-report.mjs --lab --include-device-blocks
 
 Lab report including password lock/unlock on website/app test block:
-  node scripts/generate-cold-turkey-report.js --lab --include-password-lock
+  node scripts/generate-cold-turkey-report.mjs --lab --include-password-lock
 
 Full useful lab report:
-  node scripts/generate-cold-turkey-report.js --lab --include-device-blocks --include-password-lock
+  node scripts/generate-cold-turkey-report.mjs --lab --include-device-blocks --include-password-lock
 
 Options:
   --ct-path "/custom/path/to/Cold Turkey Blocker"

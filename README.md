@@ -109,6 +109,7 @@ npm install
 Run the extension locally in Raycast development mode:
 
 ```bash
+npm run setup -- YOUR_RAYCAST_USERNAME
 npm run dev
 ```
 
@@ -117,7 +118,7 @@ Run the local quality checks:
 ```bash
 npm test
 npm run typecheck
-npx eslint .
+npm run lint
 npm run build
 ```
 
@@ -159,7 +160,7 @@ npm run ct:report:lab-full
 The report generator supports these options:
 
 ```bash
-node scripts/generate-cold-turkey-report.js [options]
+node scripts/generate-cold-turkey-report.mjs [options]
 ```
 
 Available options:
