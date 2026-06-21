@@ -26,3 +26,5 @@ coverage/
 # IDE / Editor
 .vscode/
 .idea/
+# Cold Turkey CLI generated behaviour reports
+.cold-turkey-reports/

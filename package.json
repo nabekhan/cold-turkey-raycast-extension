@@ -120,6 +120,10 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/**/*.test.ts",
-    "publish": "npx @raycast/api@latest publish"
+    "publish": "npx @raycast/api@latest publish",
+    "ct:report": "node scripts/generate-cold-turkey-report.js",
+    "ct:report:status": "node scripts/generate-cold-turkey-report.js --status-all",
+    "ct:report:lab": "node scripts/generate-cold-turkey-report.js --lab",
+    "ct:report:lab-full": "node scripts/generate-cold-turkey-report.js --lab --include-device-blocks --include-password-lock"
   }
 }
