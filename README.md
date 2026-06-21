@@ -217,7 +217,6 @@ Safety notes:
 * The report generator never runs timed locks, random-text locks, sign-out actions, or shutdown actions.
 * Repeated lab runs may leave test block definitions in Cold Turkey because the CLI does not expose a delete-block command.
 
-
 ## License
 
 MIT
