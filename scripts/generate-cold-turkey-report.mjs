@@ -46,11 +46,11 @@
  *   change between versions.
  */
 
-const { spawnSync } = require("child_process");
-const crypto = require("crypto");
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
+import { spawnSync } from "node:child_process";
+import * as crypto from "node:crypto";
+import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 
 const DEFAULT_CT_PATH =
   os.platform() === "win32"
@@ -148,8 +148,11 @@ if (hasArg("--help") || hasArg("-h")) {
   process.exit(0);
 }
 
+const ESC = String.fromCharCode(27);
+const ANSI_ESCAPE_PATTERN = new RegExp(`${ESC}(?:[@-Z\\\\-_]|\\[[0-?]*[ -/]*[@-~])`, "g");
+
 function stripAnsi(text) {
-  return String(text || "").replace(/\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g, "");
+  return String(text || "").replace(ANSI_ESCAPE_PATTERN, "");
 }
 
 function decodeBuffer(buffer) {
