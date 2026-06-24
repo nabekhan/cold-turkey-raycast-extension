@@ -1,40 +1,27 @@
-import { Action, ActionPanel, Form, Icon, openExtensionPreferences, useNavigation } from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, useNavigation } from "@raycast/api";
 import { useState } from "react";
-import { BlockField } from "./block-field";
 import { buildBreakArgs, type BreakAction } from "../lib/command-builders";
 import { executeCli } from "../lib/ui";
 
 interface BreakControlFormProps {
-  fixedBlockName?: string;
-  initialBlockName?: string;
+  blockName: string;
   initialAction?: BreakAction;
   onSuccess?: () => void | Promise<void>;
 }
 
 export function BreakControlForm({
-  fixedBlockName,
-  initialBlockName,
+  blockName,
   initialAction = "start-delay",
   onSuccess,
 }: BreakControlFormProps) {
   const { pop } = useNavigation();
-  const [blockName, setBlockName] = useState(fixedBlockName ?? initialBlockName ?? "");
   const [action, setAction] = useState<BreakAction>(initialAction);
-  const [blockError, setBlockError] = useState<string>();
 
   async function handleSubmit() {
-    const selectedBlock = (fixedBlockName ?? blockName).trim();
-    setBlockError(undefined);
-
-    if (!selectedBlock) {
-      setBlockError("Select a block.");
-      return;
-    }
-
     const result = await executeCli({
-      args: buildBreakArgs(selectedBlock, action),
+      args: buildBreakArgs(blockName, action),
       workingTitle: `${breakActionTitle(action)}…`,
-      successTitle: breakSuccessTitle(action, selectedBlock),
+      successTitle: breakSuccessTitle(action, blockName),
       onSuccess,
     });
 
@@ -43,27 +30,18 @@ export function BreakControlForm({
 
   return (
     <Form
-      navigationTitle="Control Cold Turkey Break"
+      navigationTitle="Control Break"
       actions={
         <ActionPanel>
-          <Action.SubmitForm title={breakActionTitle(action)} icon={Icon.Stopwatch} onSubmit={handleSubmit} />
-          <Action title="Open Extension Preferences" icon={Icon.Cog} onAction={openExtensionPreferences} />
+          <Action.SubmitForm
+            title={breakActionTitle(action)}
+            icon={Icon.Stopwatch}
+            onSubmit={handleSubmit}
+          />
         </ActionPanel>
       }
     >
-      {fixedBlockName ? (
-        <Form.Description title="Block" text={fixedBlockName} />
-      ) : (
-        <BlockField
-          value={blockName}
-          onChange={(value) => {
-            setBlockName(value);
-            setBlockError(undefined);
-          }}
-          preferredValue={initialBlockName}
-          error={blockError}
-        />
-      )}
+      <Form.Description title="Block" text={blockName} />
 
       <Form.Dropdown
         id="action"
@@ -71,9 +49,21 @@ export function BreakControlForm({
         value={action}
         onChange={(value) => setAction(value as BreakAction)}
       >
-        <Form.Dropdown.Item value="start-delay" title="Start Delay Break Countdown" icon={Icon.Play} />
-        <Form.Dropdown.Item value="stop-delay" title="Stop Delay Break" icon={Icon.Stop} />
-        <Form.Dropdown.Item value="stop-random-text" title="Stop Random-Text Break" icon={Icon.Text} />
+        <Form.Dropdown.Item
+          value="start-delay"
+          title="Start Delay Break Countdown"
+          icon={Icon.Play}
+        />
+        <Form.Dropdown.Item
+          value="stop-delay"
+          title="Stop Delay Break"
+          icon={Icon.Stop}
+        />
+        <Form.Dropdown.Item
+          value="stop-random-text"
+          title="Stop Random-Text Break"
+          icon={Icon.Text}
+        />
       </Form.Dropdown>
 
       <Form.Description

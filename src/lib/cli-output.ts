@@ -8,7 +8,10 @@ export interface ParsedBlock {
 
 const ESC = String.fromCharCode(27);
 const CSI = String.fromCharCode(155);
-const ANSI_ESCAPE_PATTERN = new RegExp(`(?:${ESC}\\[|${CSI})[0-?]*[ -/]*[@-~]`, "g");
+const ANSI_ESCAPE_PATTERN = new RegExp(
+  `(?:${ESC}\\[|${CSI})[0-?]*[ -/]*[@-~]`,
+  "g",
+);
 
 export function decodeCliOutput(value: string | Buffer): string {
   if (typeof value === "string") return cleanCliOutput(value);
@@ -47,7 +50,8 @@ export function looksLikeHelpOutput(value: string): boolean {
   const output = cleanCliOutput(value).toLowerCase();
   return (
     output.includes('-start "block name"') &&
-    (output.includes("-list-blocks") || output.includes("starts the specified block"))
+    (output.includes("-list-blocks") ||
+      output.includes("starts the specified block"))
   );
 }
 
@@ -90,7 +94,9 @@ export function parseBlockList(value: string): ParsedBlock[] {
 
     line = line.replace(/^(?:[•*>]|[-–—]\s+|\d+[.)]\s+)/, "").trim();
 
-    const statusSuffix = line.match(/^(.*?)\s*(?:[:–—-]|\bis\b)\s*(enabled|disabled)\.?$/i);
+    const statusSuffix = line.match(
+      /^(.*?)\s*(?:[:–—-]|\bis\b)\s*(enabled|disabled)\.?$/i,
+    );
     if (statusSuffix?.[1]) line = statusSuffix[1].trim();
 
     const normalized = normalizeBlockName(line);
@@ -119,10 +125,13 @@ export function parseBlockState(value: string): BlockState {
     .reverse();
 
   for (const line of lines) {
-    if (/^(?:disabled|inactive|off|stopped|false)$/.test(line)) return "disabled";
+    if (/^(?:disabled|inactive|off|stopped|false)$/.test(line))
+      return "disabled";
     if (/^(?:enabled|active|on|started|true)$/.test(line)) return "enabled";
 
-    const explicit = line.match(/(?:status\s*[:=-]\s*|\bis\s+)(enabled|disabled)\b/);
+    const explicit = line.match(
+      /(?:status\s*[:=-]\s*|\bis\s+)(enabled|disabled)\b/,
+    );
     if (explicit?.[1] === "enabled") return "enabled";
     if (explicit?.[1] === "disabled") return "disabled";
 
@@ -134,7 +143,10 @@ export function parseBlockState(value: string): BlockState {
   return "unknown";
 }
 
-export function compactCliOutput(value: string, maxLength = 240): string | undefined {
+export function compactCliOutput(
+  value: string,
+  maxLength = 240,
+): string | undefined {
   const output = cleanCliOutput(value).replace(/\s+/g, " ");
   if (!output) return undefined;
   if (output.length <= maxLength) return output;
@@ -165,9 +177,17 @@ function parseJsonBlockList(output: string): ParsedBlock[] | undefined {
         continue;
       }
 
-      if (entry && typeof entry === "object" && "name" in entry && typeof entry.name === "string") {
+      if (
+        entry &&
+        typeof entry === "object" &&
+        "name" in entry &&
+        typeof entry.name === "string"
+      ) {
         const name = normalizeBlockName(entry.name);
-        const rawKind = "kind" in entry && typeof entry.kind === "string" ? entry.kind.toLowerCase() : "";
+        const rawKind =
+          "kind" in entry && typeof entry.kind === "string"
+            ? entry.kind.toLowerCase()
+            : "";
         const kind: BlockKind = rawKind.includes("device")
           ? "device"
           : rawKind.includes("web") || rawKind.includes("app")
@@ -182,9 +202,14 @@ function parseJsonBlockList(output: string): ParsedBlock[] | undefined {
   }
 }
 
-function parseSectionHeading(value: string): Exclude<BlockKind, "unknown"> | undefined {
+function parseSectionHeading(
+  value: string,
+): Exclude<BlockKind, "unknown"> | undefined {
   const heading = value.replace(/[:\s]+$/, "").trim();
-  if (/^website\s*(?:&|and)\s*app\s+blocks?$/i.test(heading) || /^website\s+blocks?$/i.test(heading)) {
+  if (
+    /^website\s*(?:&|and)\s*app\s+blocks?$/i.test(heading) ||
+    /^website\s+blocks?$/i.test(heading)
+  ) {
     return "website-app";
   }
   if (/^device\s+blocks?$/i.test(heading)) return "device";
@@ -193,11 +218,15 @@ function parseSectionHeading(value: string): Exclude<BlockKind, "unknown"> | und
 
 function shouldSkipBlockListLine(line: string): boolean {
   return (
-    /^(?:cold turkey blocker|blocks?|block names?|available blocks?|list of blocks)\s*:?$/i.test(line) ||
+    /^(?:cold turkey blocker|blocks?|block names?|available blocks?|list of blocks)\s*:?$/i.test(
+      line,
+    ) ||
     /^no blocks(?: found)?\.?$/i.test(line) ||
     /^usage\s*:/i.test(line) ||
     /^where \[options\]/i.test(line) ||
-    /^-{1,2}(?:start|stop|toggle|status|list-blocks|add|add-block|add-device-block|help|lock)\b/i.test(line) ||
+    /^-{1,2}(?:start|stop|toggle|status|list-blocks|add|add-block|add-device-block|help|lock)\b/i.test(
+      line,
+    ) ||
     /^error\s*:/i.test(line)
   );
 }
@@ -219,7 +248,8 @@ function uniqueBlocks(values: ParsedBlock[]): ParsedBlock[] {
   for (const block of values) {
     const key = block.name.toLocaleLowerCase();
     const previous = byName.get(key);
-    if (!previous || (previous.kind === "unknown" && block.kind !== "unknown")) byName.set(key, block);
+    if (!previous || (previous.kind === "unknown" && block.kind !== "unknown"))
+      byName.set(key, block);
   }
   return [...byName.values()];
 }

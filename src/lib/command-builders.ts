@@ -1,6 +1,15 @@
-export type StartMode = "unlocked" | "as-is" | "timed" | "password" | "random-text";
+export type StartMode =
+  | "unlocked"
+  | "as-is"
+  | "timed"
+  | "password"
+  | "random-text";
 export type EntryKind = "website" | "exception";
-export type BlockCreationKind = "website-app" | "device-lock" | "device-sign-out" | "device-shut-down";
+export type BlockCreationKind =
+  | "website-app"
+  | "device-lock"
+  | "device-sign-out"
+  | "device-shut-down";
 export type BreakAction = "start-delay" | "stop-delay" | "stop-random-text";
 
 export interface StartCommandOptions {
@@ -21,36 +30,61 @@ export function buildStartArgs(options: StartCommandOptions): string[] {
     case "as-is":
       return [...args, "-as-is"];
     case "timed":
-      return [...args, "-lock", requirePositiveInteger(options.minutes, "Lock duration")];
+      return [
+        ...args,
+        "-lock",
+        requirePositiveInteger(options.minutes, "Lock duration"),
+      ];
     case "password":
       return [...args, "-password", requirePassword(options.password)];
     case "random-text":
-      return [...args, "-random-text", requireIntegerInRange(options.randomTextLength, 1, 999, "Random text length")];
+      return [
+        ...args,
+        "-random-text",
+        requireIntegerInRange(
+          options.randomTextLength,
+          1,
+          999,
+          "Random text length",
+        ),
+      ];
   }
 }
 
 export function buildStopArgs(blockName: string, password?: string): string[] {
   const args = ["-stop", requireBlockName(blockName)];
-  return password === undefined ? args : [...args, "-password", requirePassword(password)];
-}
-
-export function buildToggleArgs(blockName: string): string[] {
-  return ["-toggle", requireBlockName(blockName)];
+  return password === undefined
+    ? args
+    : [...args, "-password", requirePassword(password)];
 }
 
 export function buildStatusArgs(blockName: string): string[] {
   return ["-status", requireBlockName(blockName)];
 }
 
-export function buildAddEntryArgs(blockName: string, kind: EntryKind, entry: string): string[] {
+export function buildAddEntryArgs(
+  blockName: string,
+  kind: EntryKind,
+  entry: string,
+): string[] {
   const normalizedEntry = entry.trim();
-  if (!normalizedEntry) throw new Error("Website or exception cannot be empty.");
-  if (/[\r\n\0]/.test(normalizedEntry)) throw new Error("Each website or exception must be one line.");
+  if (!normalizedEntry)
+    throw new Error("Website or exception cannot be empty.");
+  if (/[\r\n\0]/.test(normalizedEntry))
+    throw new Error("Each website or exception must be one line.");
 
-  return ["-add", requireBlockName(blockName), kind === "website" ? "-web" : "-exception", normalizedEntry];
+  return [
+    "-add",
+    requireBlockName(blockName),
+    kind === "website" ? "-web" : "-exception",
+    normalizedEntry,
+  ];
 }
 
-export function buildCreateBlockArgs(name: string, kind: BlockCreationKind): string[] {
+export function buildCreateBlockArgs(
+  name: string,
+  kind: BlockCreationKind,
+): string[] {
   const blockName = requireBlockName(name);
 
   switch (kind) {
@@ -65,7 +99,10 @@ export function buildCreateBlockArgs(name: string, kind: BlockCreationKind): str
   }
 }
 
-export function buildBreakArgs(blockName: string, action: BreakAction): string[] {
+export function buildBreakArgs(
+  blockName: string,
+  action: BreakAction,
+): string[] {
   const name = requireBlockName(blockName);
 
   switch (action) {
@@ -81,18 +118,32 @@ export function buildBreakArgs(blockName: string, action: BreakAction): string[]
 function requireBlockName(value: string): string {
   const name = value.trim();
   if (!name) throw new Error("Select or enter a block name.");
-  if (/[\r\n\0]/.test(name)) throw new Error("Block names cannot contain line breaks or null characters.");
+  if (/[\r\n\0]/.test(name))
+    throw new Error(
+      "Block names cannot contain line breaks or null characters.",
+    );
   return name;
 }
 
-function requirePositiveInteger(value: number | undefined, label: string): string {
-  if (!Number.isInteger(value) || (value ?? 0) < 1) throw new Error(`${label} must be a whole number of at least 1.`);
+function requirePositiveInteger(
+  value: number | undefined,
+  label: string,
+): string {
+  if (!Number.isInteger(value) || (value ?? 0) < 1)
+    throw new Error(`${label} must be a whole number of at least 1.`);
   return String(value);
 }
 
-function requireIntegerInRange(value: number | undefined, min: number, max: number, label: string): string {
+function requireIntegerInRange(
+  value: number | undefined,
+  min: number,
+  max: number,
+  label: string,
+): string {
   if (!Number.isInteger(value) || (value ?? 0) < min || (value ?? 0) > max) {
-    throw new Error(`${label} must be a whole number between ${min} and ${max}.`);
+    throw new Error(
+      `${label} must be a whole number between ${min} and ${max}.`,
+    );
   }
   return String(value);
 }
@@ -101,7 +152,9 @@ function requirePassword(value: string | undefined): string {
   const password = value ?? "";
   if (!password) throw new Error("Password is required.");
   if (/\s/.test(password) || password.includes('"') || password.includes("'")) {
-    throw new Error("Cold Turkey CLI passwords cannot contain spaces or quote characters.");
+    throw new Error(
+      "Cold Turkey CLI passwords cannot contain spaces or quote characters.",
+    );
   }
   return password;
 }
