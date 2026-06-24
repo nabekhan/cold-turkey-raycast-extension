@@ -23,10 +23,7 @@ export function parseEntryLines(value: string): string[] {
   return entries;
 }
 
-export function initialBlockEntries(
-  websitesText: string,
-  exceptionsText: string,
-): BlockEntryInput[] {
+export function initialBlockEntries(websitesText: string, exceptionsText: string): BlockEntryInput[] {
   return [
     ...parseEntryLines(websitesText).map((entry) => ({
       kind: "website" as const,
@@ -40,16 +37,12 @@ export function initialBlockEntries(
 }
 
 export function summarizeEntryCounts(entries: BlockEntryInput[]): string {
-  const websiteCount = entries.filter(
-    (entry) => entry.kind === "website",
-  ).length;
+  const websiteCount = entries.filter((entry) => entry.kind === "website").length;
   const exceptionCount = entries.length - websiteCount;
   const parts: string[] = [];
 
-  if (websiteCount > 0)
-    parts.push(`${websiteCount} ${pluralize("website", websiteCount)}`);
-  if (exceptionCount > 0)
-    parts.push(`${exceptionCount} ${pluralize("exception", exceptionCount)}`);
+  if (websiteCount > 0) parts.push(`${websiteCount} ${pluralize("website", websiteCount)}`);
+  if (exceptionCount > 0) parts.push(`${exceptionCount} ${pluralize("exception", exceptionCount)}`);
 
   return parts.join(" and ");
 }

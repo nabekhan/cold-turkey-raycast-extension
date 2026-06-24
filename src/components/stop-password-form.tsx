@@ -11,11 +11,7 @@ interface StopPasswordFormProps {
   onSuccess?: () => void | Promise<void>;
 }
 
-export function StopPasswordForm({
-  blockName,
-  blockKind,
-  onSuccess,
-}: StopPasswordFormProps) {
+export function StopPasswordForm({ blockName, blockKind, onSuccess }: StopPasswordFormProps) {
   const { pop } = useNavigation();
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState<string>();
@@ -23,15 +19,8 @@ export function StopPasswordForm({
   async function handleSubmit() {
     setPasswordError(undefined);
 
-    if (
-      !password ||
-      /\s/.test(password) ||
-      password.includes('"') ||
-      password.includes("'")
-    ) {
-      setPasswordError(
-        "Use the block password without spaces or quote characters.",
-      );
+    if (!password || /\s/.test(password) || password.includes('"') || password.includes("'")) {
+      setPasswordError("Use the block password without spaces or quote characters.");
       return;
     }
 
@@ -56,11 +45,7 @@ export function StopPasswordForm({
       navigationTitle="Stop with Password"
       actions={
         <ActionPanel>
-          <Action.SubmitForm
-            title="Stop with Password"
-            icon={Icon.Stop}
-            onSubmit={handleSubmit}
-          />
+          <Action.SubmitForm title="Stop with Password" icon={Icon.Stop} onSubmit={handleSubmit} />
         </ActionPanel>
       }
     >

@@ -1,29 +1,9 @@
-import {
-  Action,
-  ActionPanel,
-  Form,
-  Icon,
-  Toast,
-  showToast,
-  useNavigation,
-} from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, Toast, showToast, useNavigation } from "@raycast/api";
 import { useState } from "react";
-import {
-  buildAddEntryArgs,
-  buildCreateBlockArgs,
-  type BlockCreationKind,
-} from "../lib/command-builders";
-import {
-  listBlocks,
-  runColdTurkey,
-  waitForBlockPresence,
-} from "../lib/cold-turkey";
+import { buildAddEntryArgs, buildCreateBlockArgs, type BlockCreationKind } from "../lib/command-builders";
+import { listBlocks, runColdTurkey, waitForBlockPresence } from "../lib/cold-turkey";
 import type { BlockKind } from "../lib/cli-output";
-import {
-  initialBlockEntries,
-  summarizeEntryCounts,
-  type BlockEntryInput,
-} from "../lib/entries";
+import { initialBlockEntries, summarizeEntryCounts, type BlockEntryInput } from "../lib/entries";
 import { applyCliFailureToast, formatCliError } from "../lib/ui";
 
 interface CreateBlockFormProps {
@@ -44,17 +24,11 @@ export function CreateBlockForm({ onSuccess }: CreateBlockFormProps) {
   const [websitesError, setWebsitesError] = useState<string>();
   const [exceptionsError, setExceptionsError] = useState<string>();
 
-  const entries =
-    kind === "website-app"
-      ? initialBlockEntries(websitesText, exceptionsText)
-      : [];
+  const entries = kind === "website-app" ? initialBlockEntries(websitesText, exceptionsText) : [];
 
   async function handleSubmit() {
     const trimmedName = name.trim();
-    const initialEntries =
-      kind === "website-app"
-        ? initialBlockEntries(websitesText, exceptionsText)
-        : [];
+    const initialEntries = kind === "website-app" ? initialBlockEntries(websitesText, exceptionsText) : [];
 
     setNameError(undefined);
     setWebsitesError(undefined);
@@ -65,9 +39,7 @@ export function CreateBlockForm({ onSuccess }: CreateBlockFormProps) {
       return;
     }
     if (/[\r\n\0]/.test(trimmedName)) {
-      setNameError(
-        "Block names cannot contain line breaks or null characters.",
-      );
+      setNameError("Block names cannot contain line breaks or null characters.");
       return;
     }
 
@@ -84,17 +56,14 @@ export function CreateBlockForm({ onSuccess }: CreateBlockFormProps) {
 
     try {
       const existing = (await listBlocks()).find(
-        (block) =>
-          block.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase(),
+        (block) => block.name.toLocaleLowerCase() === trimmedName.toLocaleLowerCase(),
       );
       if (existing) {
         setNameError(`A block named “${existing.name}” already exists.`);
         return;
       }
     } catch (error) {
-      setNameError(
-        `Could not check existing names: ${formatCliError(error, 180)}`,
-      );
+      setNameError(`Could not check existing names: ${formatCliError(error, 180)}`);
       return;
     }
 
@@ -115,9 +84,7 @@ export function CreateBlockForm({ onSuccess }: CreateBlockFormProps) {
         toast.message = `${entryLabel(entry.kind)}: ${entry.entry}`;
 
         try {
-          await runColdTurkey(
-            buildAddEntryArgs(trimmedName, entry.kind, entry.entry),
-          );
+          await runColdTurkey(buildAddEntryArgs(trimmedName, entry.kind, entry.entry));
           successCount += 1;
         } catch (error) {
           failures.push({ ...entry, error });
@@ -146,9 +113,7 @@ export function CreateBlockForm({ onSuccess }: CreateBlockFormProps) {
 
       toast.style = Toast.Style.Success;
       toast.title =
-        initialEntries.length > 0
-          ? `Created ${trimmedName} with initial entries`
-          : `Created ${trimmedName}`;
+        initialEntries.length > 0 ? `Created ${trimmedName} with initial entries` : `Created ${trimmedName}`;
       toast.message =
         initialEntries.length > 0
           ? `${summarizeEntryCounts(initialEntries)} added. Cold Turkey has no CLI command to read entries back.`
@@ -198,26 +163,10 @@ export function CreateBlockForm({ onSuccess }: CreateBlockFormProps) {
         value={kind}
         onChange={(value) => setKind(value as BlockCreationKind)}
       >
-        <Form.Dropdown.Item
-          value="website-app"
-          title="Website & App Block"
-          icon={Icon.Globe}
-        />
-        <Form.Dropdown.Item
-          value="device-lock"
-          title="Device Block — Lock Screen"
-          icon={Icon.Lock}
-        />
-        <Form.Dropdown.Item
-          value="device-sign-out"
-          title="Device Block — Sign Out"
-          icon={Icon.Person}
-        />
-        <Form.Dropdown.Item
-          value="device-shut-down"
-          title="Device Block — Shut Down"
-          icon={Icon.Power}
-        />
+        <Form.Dropdown.Item value="website-app" title="Website & App Block" icon={Icon.Globe} />
+        <Form.Dropdown.Item value="device-lock" title="Device Block — Lock Screen" icon={Icon.Lock} />
+        <Form.Dropdown.Item value="device-sign-out" title="Device Block — Sign Out" icon={Icon.Person} />
+        <Form.Dropdown.Item value="device-shut-down" title="Device Block — Shut Down" icon={Icon.Power} />
       </Form.Dropdown>
 
       {kind === "website-app" ? (
@@ -262,9 +211,7 @@ export function CreateBlockForm({ onSuccess }: CreateBlockFormProps) {
   );
 }
 
-async function refreshParent(
-  onSuccess: CreateBlockFormProps["onSuccess"],
-): Promise<void> {
+async function refreshParent(onSuccess: CreateBlockFormProps["onSuccess"]): Promise<void> {
   try {
     await onSuccess?.();
   } catch (error) {

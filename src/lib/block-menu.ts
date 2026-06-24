@@ -1,10 +1,7 @@
 import type { BlockKind, BlockState } from "./cli-output";
 
 export type BlockPrimaryAction = "start" | "stop" | "refresh";
-export type BlockSecondaryAction =
-  | "start-options"
-  | "stop-with-password"
-  | "diagnostics";
+export type BlockSecondaryAction = "start-options" | "stop-with-password" | "diagnostics";
 
 export interface BlockMenuPolicy {
   primaryAction: BlockPrimaryAction;
@@ -13,10 +10,7 @@ export interface BlockMenuPolicy {
   showBreakControls: boolean;
 }
 
-export function getBlockMenuPolicy(block: {
-  state: BlockState;
-  kind: BlockKind;
-}): BlockMenuPolicy {
+export function getBlockMenuPolicy(block: { state: BlockState; kind: BlockKind }): BlockMenuPolicy {
   const isWebsiteBlock = block.kind === "website-app";
 
   if (block.state === "enabled") {

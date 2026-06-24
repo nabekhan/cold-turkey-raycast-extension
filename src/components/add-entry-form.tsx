@@ -1,12 +1,4 @@
-import {
-  Action,
-  ActionPanel,
-  Form,
-  Icon,
-  Toast,
-  showToast,
-  useNavigation,
-} from "@raycast/api";
+import { Action, ActionPanel, Form, Icon, Toast, showToast, useNavigation } from "@raycast/api";
 import { useState } from "react";
 import { buildAddEntryArgs, type EntryKind } from "../lib/command-builders";
 import { parseEntryLines } from "../lib/entries";
@@ -19,11 +11,7 @@ interface AddEntryFormProps {
   onSuccess?: () => void | Promise<void>;
 }
 
-export function AddEntryForm({
-  blockName,
-  initialKind = "website",
-  onSuccess,
-}: AddEntryFormProps) {
+export function AddEntryForm({ blockName, initialKind = "website", onSuccess }: AddEntryFormProps) {
   const { pop } = useNavigation();
   const [kind, setKind] = useState<EntryKind>(initialKind);
   const [entriesText, setEntriesText] = useState("");
@@ -68,8 +56,7 @@ export function AddEntryForm({
 
     toast.style = Toast.Style.Success;
     toast.title = `Added ${successCount} ${entryNoun(kind, successCount)}`;
-    toast.message =
-      "Cold Turkey returned no error; this CLI has no entry read-back command.";
+    toast.message = "Cold Turkey returned no error; this CLI has no entry read-back command.";
     pop();
   }
 
@@ -79,11 +66,7 @@ export function AddEntryForm({
       actions={
         <ActionPanel>
           <Action.SubmitForm
-            title={
-              kind === "website"
-                ? "Add to Website List"
-                : "Add to Exception List"
-            }
+            title={kind === "website" ? "Add to Website List" : "Add to Exception List"}
             icon={kind === "website" ? Icon.Globe : Icon.Shield}
             onSubmit={handleSubmit}
           />
@@ -92,22 +75,9 @@ export function AddEntryForm({
     >
       <Form.Description title="Block" text={blockName} />
 
-      <Form.Dropdown
-        id="kind"
-        title="Destination"
-        value={kind}
-        onChange={(value) => setKind(value as EntryKind)}
-      >
-        <Form.Dropdown.Item
-          value="website"
-          title="Website List"
-          icon={Icon.Globe}
-        />
-        <Form.Dropdown.Item
-          value="exception"
-          title="Exception List"
-          icon={Icon.Shield}
-        />
+      <Form.Dropdown id="kind" title="Destination" value={kind} onChange={(value) => setKind(value as EntryKind)}>
+        <Form.Dropdown.Item value="website" title="Website List" icon={Icon.Globe} />
+        <Form.Dropdown.Item value="exception" title="Exception List" icon={Icon.Shield} />
       </Form.Dropdown>
 
       <Form.TextArea

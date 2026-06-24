@@ -1,24 +1,7 @@
-import {
-  Action,
-  ActionPanel,
-  Detail,
-  Icon,
-  Keyboard,
-  openExtensionPreferences,
-} from "@raycast/api";
+import { Action, ActionPanel, Detail, Icon, Keyboard, openExtensionPreferences } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
-import {
-  getBlockStatusWithRetry,
-  getCliContext,
-  getCliHelp,
-  runColdTurkey,
-  type BlockInfo,
-} from "./lib/cold-turkey";
-import {
-  blockKindLabel,
-  cleanCliOutput,
-  parseBlockList,
-} from "./lib/cli-output";
+import { getBlockStatusWithRetry, getCliContext, getCliHelp, runColdTurkey, type BlockInfo } from "./lib/cold-turkey";
+import { blockKindLabel, cleanCliOutput, parseBlockList } from "./lib/cli-output";
 import { formatCliError } from "./lib/ui";
 
 interface DiagnosticsResult {
@@ -31,9 +14,7 @@ interface DiagnosticsResult {
 
 export default function CliDiagnosticsCommand() {
   const { data, isLoading, revalidate } = usePromise(loadDiagnostics);
-  const markdown = data
-    ? buildReport(data)
-    : "# Cold Turkey CLI Diagnostics\n\nLoading…";
+  const markdown = data ? buildReport(data) : "# Cold Turkey CLI Diagnostics\n\nLoading…";
 
   return (
     <Detail
@@ -48,34 +29,14 @@ export default function CliDiagnosticsCommand() {
             onAction={revalidate}
           />
           {data ? (
-            <Action.CopyToClipboard
-              title="Copy Full Diagnostic Report"
-              content={buildPlainTextReport(data)}
-            />
+            <Action.CopyToClipboard title="Copy Full Diagnostic Report" content={buildPlainTextReport(data)} />
           ) : null}
           {data?.context ? (
-            <Action.CopyToClipboard
-              title="Copy Executable Path"
-              content={data.context.executablePath}
-            />
+            <Action.CopyToClipboard title="Copy Executable Path" content={data.context.executablePath} />
           ) : null}
-          {data?.helpOutput ? (
-            <Action.CopyToClipboard
-              title="Copy CLI Help"
-              content={data.helpOutput}
-            />
-          ) : null}
-          {data?.listOutput ? (
-            <Action.CopyToClipboard
-              title="Copy Raw Block List"
-              content={data.listOutput}
-            />
-          ) : null}
-          <Action
-            title="Open Extension Preferences"
-            icon={Icon.Cog}
-            onAction={openExtensionPreferences}
-          />
+          {data?.helpOutput ? <Action.CopyToClipboard title="Copy CLI Help" content={data.helpOutput} /> : null}
+          {data?.listOutput ? <Action.CopyToClipboard title="Copy Raw Block List" content={data.listOutput} /> : null}
+          <Action title="Open Extension Preferences" icon={Icon.Cog} onAction={openExtensionPreferences} />
         </ActionPanel>
       }
     />
@@ -113,15 +74,9 @@ async function loadDiagnostics(): Promise<DiagnosticsResult> {
 
 function buildReport(data: DiagnosticsResult): string {
   const version = parseVersion(data.helpOutput);
-  const enabled = data.blocks.filter(
-    (block) => block.state === "enabled",
-  ).length;
-  const disabled = data.blocks.filter(
-    (block) => block.state === "disabled",
-  ).length;
-  const unknown = data.blocks.filter(
-    (block) => block.state === "unknown",
-  ).length;
+  const enabled = data.blocks.filter((block) => block.state === "enabled").length;
+  const disabled = data.blocks.filter((block) => block.state === "disabled").length;
+  const unknown = data.blocks.filter((block) => block.state === "unknown").length;
 
   const lines = [
     "# Cold Turkey CLI Diagnostics",
@@ -141,22 +96,14 @@ function buildReport(data: DiagnosticsResult): string {
   ];
 
   if (data.errors.length > 0) {
-    lines.push(
-      "",
-      "## Errors",
-      "",
-      ...data.errors.map((error) => `- ${escapeMarkdown(error)}`),
-    );
+    lines.push("", "## Errors", "", ...data.errors.map((error) => `- ${escapeMarkdown(error)}`));
   }
 
   lines.push("", "## Parsed Blocks and Statuses", "");
   if (data.blocks.length === 0) {
     lines.push("No blocks were parsed.");
   } else {
-    lines.push(
-      "| Block | Type | Status | Raw `-status` output |",
-      "|---|---|---|---|",
-    );
+    lines.push("| Block | Type | Status | Raw `-status` output |", "|---|---|---|---|");
     for (const block of data.blocks) {
       lines.push(
         `| ${escapeTable(block.name)} | ${escapeTable(blockKindLabel(block.kind))} | ${escapeTable(block.state)} | ${escapeTable(block.rawStatus || "(no output)")} |`,
@@ -187,8 +134,7 @@ function buildReport(data: DiagnosticsResult): string {
 
 function buildPlainTextReport(data: DiagnosticsResult): string {
   const rows = data.blocks.map(
-    (block) =>
-      `${block.name}\t${blockKindLabel(block.kind)}\t${block.state}\t${block.rawStatus || "(no output)"}`,
+    (block) => `${block.name}\t${blockKindLabel(block.kind)}\t${block.state}\t${block.rawStatus || "(no output)"}`,
   );
   return [
     "Cold Turkey CLI Diagnostics",
@@ -211,9 +157,7 @@ function buildPlainTextReport(data: DiagnosticsResult): string {
 }
 
 function parseVersion(helpOutput?: string): string | undefined {
-  return helpOutput
-    ?.match(/Cold Turkey Blocker\s*\[Version\s+([^\]]+)\]/i)?.[1]
-    ?.trim();
+  return helpOutput?.match(/Cold Turkey Blocker\s*\[Version\s+([^\]]+)\]/i)?.[1]?.trim();
 }
 
 function codeBlock(value: string): string {

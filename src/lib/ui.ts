@@ -1,11 +1,4 @@
-import {
-  Alert,
-  Icon,
-  Toast,
-  confirmAlert,
-  openExtensionPreferences,
-  showToast,
-} from "@raycast/api";
+import { Alert, Icon, Toast, confirmAlert, openExtensionPreferences, showToast } from "@raycast/api";
 import {
   ColdTurkeyCliError,
   getPreferences,
@@ -17,12 +10,7 @@ import {
   type BlockInfo,
   type CliResult,
 } from "./cold-turkey";
-import {
-  blockKindLabel,
-  compactCliOutput,
-  type BlockKind,
-  type BlockState,
-} from "./cli-output";
+import { blockKindLabel, compactCliOutput, type BlockKind, type BlockState } from "./cli-output";
 
 export type CliVerification =
   | {
@@ -51,9 +39,7 @@ export interface ExecuteCliOptions {
   onSuccess?: (result: CliExecutionResult) => void | Promise<void>;
 }
 
-export async function executeCli(
-  options: ExecuteCliOptions,
-): Promise<CliExecutionResult | undefined> {
+export async function executeCli(options: ExecuteCliOptions): Promise<CliExecutionResult | undefined> {
   const toast = await showToast({
     style: Toast.Style.Animated,
     title: options.workingTitle,
@@ -98,10 +84,7 @@ export function applyCliFailureToast(
       : "Cold Turkey command failed";
   toast.message = formatCliError(error);
 
-  if (
-    error instanceof ColdTurkeyCliError &&
-    ["missing-executable", "permission-denied"].includes(error.kind)
-  ) {
+  if (error instanceof ColdTurkeyCliError && ["missing-executable", "permission-denied"].includes(error.kind)) {
     toast.primaryAction = {
       title: "Open Extension Preferences",
       onAction: () => openExtensionPreferences(),
@@ -111,14 +94,10 @@ export function applyCliFailureToast(
 
 export function formatCliError(error: unknown, maxLength = 320): string {
   if (error instanceof ColdTurkeyCliError) {
-    const message =
-      error.kind === "verification-failed"
-        ? error.message
-        : error.output || error.message;
+    const message = error.kind === "verification-failed" ? error.message : error.output || error.message;
     return compactCliOutput(message, maxLength) ?? error.message;
   }
-  if (error instanceof Error)
-    return compactCliOutput(error.message, maxLength) ?? error.name;
+  if (error instanceof Error) return compactCliOutput(error.message, maxLength) ?? error.name;
   return compactCliOutput(String(error), maxLength) ?? "Unknown error";
 }
 
@@ -140,19 +119,11 @@ export async function confirmPotentialLock(
   });
 }
 
-function successMessage(
-  options: ExecuteCliOptions,
-  result: CliExecutionResult,
-): string | undefined {
+function successMessage(options: ExecuteCliOptions, result: CliExecutionResult): string | undefined {
   if (options.successMessage) return options.successMessage;
-  if (result.status)
-    return `Status confirmed: ${capitalize(result.status.state)}`;
-  if (result.createdBlock)
-    return `Confirmed in ${blockKindLabel(result.createdBlock.kind)} blocks`;
-  return (
-    compactCliOutput(result.cli.output) ??
-    "Command completed; the CLI returned no text output."
-  );
+  if (result.status) return `Status confirmed: ${capitalize(result.status.state)}`;
+  if (result.createdBlock) return `Confirmed in ${blockKindLabel(result.createdBlock.kind)} blocks`;
+  return compactCliOutput(result.cli.output) ?? "Command completed; the CLI returned no text output.";
 }
 
 function capitalize(value: string): string {

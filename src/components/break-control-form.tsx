@@ -9,11 +9,7 @@ interface BreakControlFormProps {
   onSuccess?: () => void | Promise<void>;
 }
 
-export function BreakControlForm({
-  blockName,
-  initialAction = "start-delay",
-  onSuccess,
-}: BreakControlFormProps) {
+export function BreakControlForm({ blockName, initialAction = "start-delay", onSuccess }: BreakControlFormProps) {
   const { pop } = useNavigation();
   const [action, setAction] = useState<BreakAction>(initialAction);
 
@@ -33,11 +29,7 @@ export function BreakControlForm({
       navigationTitle="Control Break"
       actions={
         <ActionPanel>
-          <Action.SubmitForm
-            title={breakActionTitle(action)}
-            icon={Icon.Stopwatch}
-            onSubmit={handleSubmit}
-          />
+          <Action.SubmitForm title={breakActionTitle(action)} icon={Icon.Stopwatch} onSubmit={handleSubmit} />
         </ActionPanel>
       }
     >
@@ -49,21 +41,9 @@ export function BreakControlForm({
         value={action}
         onChange={(value) => setAction(value as BreakAction)}
       >
-        <Form.Dropdown.Item
-          value="start-delay"
-          title="Start Delay Break Countdown"
-          icon={Icon.Play}
-        />
-        <Form.Dropdown.Item
-          value="stop-delay"
-          title="Stop Delay Break"
-          icon={Icon.Stop}
-        />
-        <Form.Dropdown.Item
-          value="stop-random-text"
-          title="Stop Random-Text Break"
-          icon={Icon.Text}
-        />
+        <Form.Dropdown.Item value="start-delay" title="Start Delay Break Countdown" icon={Icon.Play} />
+        <Form.Dropdown.Item value="stop-delay" title="Stop Delay Break" icon={Icon.Stop} />
+        <Form.Dropdown.Item value="stop-random-text" title="Stop Random-Text Break" icon={Icon.Text} />
       </Form.Dropdown>
 
       <Form.Description

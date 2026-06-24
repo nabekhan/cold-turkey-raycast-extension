@@ -1,12 +1,4 @@
-import {
-  Action,
-  ActionPanel,
-  Color,
-  Icon,
-  Keyboard,
-  List,
-  openExtensionPreferences,
-} from "@raycast/api";
+import { Action, ActionPanel, Color, Icon, Keyboard, List, openExtensionPreferences } from "@raycast/api";
 import { useMemo } from "react";
 import CliDiagnosticsCommand from "./cli-diagnostics";
 import { AddEntryForm } from "./components/add-entry-form";
@@ -15,35 +7,18 @@ import { CreateBlockForm } from "./components/create-block-form";
 import { StartBlockForm } from "./components/start-block-form";
 import { StopPasswordForm } from "./components/stop-password-form";
 import { useBlocksWithStatus } from "./hooks/use-blocks";
-import {
-  getBlockMenuPolicy,
-  type BlockPrimaryAction,
-  type BlockSecondaryAction,
-} from "./lib/block-menu";
+import { getBlockMenuPolicy, type BlockPrimaryAction, type BlockSecondaryAction } from "./lib/block-menu";
 import { buildStartArgs, buildStopArgs } from "./lib/command-builders";
 import type { BlockInfo } from "./lib/cold-turkey";
-import {
-  blockKindLabel,
-  compactCliOutput,
-  type BlockState,
-} from "./lib/cli-output";
+import { blockKindLabel, compactCliOutput, type BlockState } from "./lib/cli-output";
 import { executeCli, formatCliError } from "./lib/ui";
 
 type Revalidate = () => void | Promise<unknown>;
 
 export default function ManageBlocksCommand() {
-  const {
-    data: blocks = [],
-    isLoading,
-    error,
-    revalidate,
-  } = useBlocksWithStatus();
+  const { data: blocks = [], isLoading, error, revalidate } = useBlocksWithStatus();
 
-  const sortedBlocks = useMemo(
-    () =>
-      [...blocks].sort((left, right) => left.name.localeCompare(right.name)),
-    [blocks],
-  );
+  const sortedBlocks = useMemo(() => [...blocks].sort((left, right) => left.name.localeCompare(right.name)), [blocks]);
 
   const sections = useMemo(
     () => [
@@ -67,9 +42,7 @@ export default function ManageBlocksCommand() {
   );
 
   const hasNoBlocks = !isLoading && blocks.length === 0;
-  const emptyTitle = error
-    ? "Could Not Load Cold Turkey Blocks"
-    : "No Cold Turkey Blocks Found";
+  const emptyTitle = error ? "Could Not Load Cold Turkey Blocks" : "No Cold Turkey Blocks Found";
   const emptyDescription = error
     ? formatCliError(error)
     : "Create a block here, or verify that your Cold Turkey version supports -list-blocks.";
@@ -88,36 +61,18 @@ export default function ManageBlocksCommand() {
           actions={
             error ? (
               <ActionPanel>
-                <Action
-                  title="Retry"
-                  icon={Icon.ArrowClockwise}
-                  onAction={revalidate}
-                />
-                <Action.Push
-                  title="Open CLI Diagnostics"
-                  icon={Icon.Terminal}
-                  target={<CliDiagnosticsCommand />}
-                />
-                <Action
-                  title="Open Extension Preferences"
-                  icon={Icon.Cog}
-                  onAction={openExtensionPreferences}
-                />
+                <Action title="Retry" icon={Icon.ArrowClockwise} onAction={revalidate} />
+                <Action.Push title="Open CLI Diagnostics" icon={Icon.Terminal} target={<CliDiagnosticsCommand />} />
+                <Action title="Open Extension Preferences" icon={Icon.Cog} onAction={openExtensionPreferences} />
               </ActionPanel>
             ) : (
               <ActionPanel>
                 <Action.Push
                   title="Create Block…"
                   icon={Icon.Plus}
-                  target={
-                    <CreateBlockForm onSuccess={revalidateAsVoid(revalidate)} />
-                  }
+                  target={<CreateBlockForm onSuccess={revalidateAsVoid(revalidate)} />}
                 />
-                <Action
-                  title="Refresh Blocks"
-                  icon={Icon.ArrowClockwise}
-                  onAction={revalidate}
-                />
+                <Action title="Refresh Blocks" icon={Icon.ArrowClockwise} onAction={revalidate} />
               </ActionPanel>
             )
           }
@@ -132,15 +87,9 @@ export default function ManageBlocksCommand() {
               <Action.Push
                 title="Create Block…"
                 icon={Icon.Plus}
-                target={
-                  <CreateBlockForm onSuccess={revalidateAsVoid(revalidate)} />
-                }
+                target={<CreateBlockForm onSuccess={revalidateAsVoid(revalidate)} />}
               />
-              <Action
-                title="Refresh Blocks"
-                icon={Icon.ArrowClockwise}
-                onAction={revalidate}
-              />
+              <Action title="Refresh Blocks" icon={Icon.ArrowClockwise} onAction={revalidate} />
             </ActionPanel>
           }
         />
@@ -149,17 +98,9 @@ export default function ManageBlocksCommand() {
       {!hasNoBlocks
         ? sections.map((section) =>
             section.blocks.length > 0 ? (
-              <List.Section
-                key={section.state}
-                title={section.title}
-                subtitle={String(section.blocks.length)}
-              >
+              <List.Section key={section.state} title={section.title} subtitle={String(section.blocks.length)}>
                 {section.blocks.map((block) => (
-                  <BlockListItem
-                    key={`${block.kind}:${block.name}`}
-                    block={block}
-                    revalidate={revalidate}
-                  />
+                  <BlockListItem key={`${block.kind}:${block.name}`} block={block} revalidate={revalidate} />
                 ))}
               </List.Section>
             ) : null,
@@ -169,13 +110,7 @@ export default function ManageBlocksCommand() {
   );
 }
 
-function BlockListItem({
-  block,
-  revalidate,
-}: {
-  block: BlockInfo;
-  revalidate: Revalidate;
-}) {
+function BlockListItem({ block, revalidate }: { block: BlockInfo; revalidate: Revalidate }) {
   const presentation = statusPresentation(block.state);
   const policy = getBlockMenuPolicy(block);
   const isDevice = block.kind === "device";
@@ -184,12 +119,8 @@ function BlockListItem({
   async function startUnlocked() {
     await executeCli({
       args: buildStartArgs({ blockName: block.name, mode: "unlocked" }),
-      workingTitle: isDevice
-        ? `Enabling schedule for ${block.name}…`
-        : `Starting ${block.name}…`,
-      successTitle: isDevice
-        ? `Enabled schedule for ${block.name}`
-        : `Started ${block.name}`,
+      workingTitle: isDevice ? `Enabling schedule for ${block.name}…` : `Starting ${block.name}…`,
+      successTitle: isDevice ? `Enabled schedule for ${block.name}` : `Started ${block.name}`,
       verification: { type: "state", block, expectedState: "enabled" },
       onSuccess: refresh,
     });
@@ -198,12 +129,8 @@ function BlockListItem({
   async function stopBlock() {
     await executeCli({
       args: buildStopArgs(block.name),
-      workingTitle: isDevice
-        ? `Disabling schedule for ${block.name}…`
-        : `Stopping ${block.name}…`,
-      successTitle: isDevice
-        ? `Disabled schedule for ${block.name}`
-        : `Stopped ${block.name}`,
+      workingTitle: isDevice ? `Disabling schedule for ${block.name}…` : `Stopping ${block.name}…`,
+      successTitle: isDevice ? `Disabled schedule for ${block.name}` : `Stopped ${block.name}`,
       verification: { type: "state", block, expectedState: "disabled" },
       onSuccess: refresh,
     });
@@ -254,21 +181,14 @@ function BlockListItem({
                 <Action.Push
                   title="Add Websites or Exceptions…"
                   icon={Icon.Globe}
-                  target={
-                    <AddEntryForm blockName={block.name} onSuccess={refresh} />
-                  }
+                  target={<AddEntryForm blockName={block.name} onSuccess={refresh} />}
                 />
               ) : null}
               {policy.showBreakControls ? (
                 <Action.Push
                   title="Control Break…"
                   icon={Icon.Stopwatch}
-                  target={
-                    <BreakControlForm
-                      blockName={block.name}
-                      onSuccess={refresh}
-                    />
-                  }
+                  target={<BreakControlForm blockName={block.name} onSuccess={refresh} />}
                 />
               ) : null}
             </ActionPanel.Section>
@@ -303,19 +223,12 @@ interface PrimaryActionContext {
   stopBlock: () => Promise<void>;
 }
 
-function blockPrimaryAction(
-  action: BlockPrimaryAction,
-  context: PrimaryActionContext,
-) {
+function blockPrimaryAction(action: BlockPrimaryAction, context: PrimaryActionContext) {
   switch (action) {
     case "start":
       return (
         <Action
-          title={
-            context.isDevice
-              ? "Enable Device Schedule (No Lock)"
-              : "Start Unlocked"
-          }
+          title={context.isDevice ? "Enable Device Schedule (No Lock)" : "Start Unlocked"}
           icon={Icon.Play}
           onAction={context.startUnlocked}
         />
@@ -323,21 +236,13 @@ function blockPrimaryAction(
     case "stop":
       return (
         <Action
-          title={
-            context.isDevice ? "Disable Device Block Schedule" : "Stop Block"
-          }
+          title={context.isDevice ? "Disable Device Block Schedule" : "Stop Block"}
           icon={Icon.Stop}
           onAction={context.stopBlock}
         />
       );
     case "refresh":
-      return (
-        <Action
-          title="Refresh Status"
-          icon={Icon.ArrowClockwise}
-          onAction={context.revalidate}
-        />
-      );
+      return <Action title="Refresh Status" icon={Icon.ArrowClockwise} onAction={context.revalidate} />;
   }
 }
 
@@ -347,10 +252,7 @@ interface SecondaryActionContext {
   revalidate: () => Promise<void>;
 }
 
-function blockSecondaryAction(
-  action: BlockSecondaryAction,
-  context: SecondaryActionContext,
-) {
+function blockSecondaryAction(action: BlockSecondaryAction, context: SecondaryActionContext) {
   switch (action) {
     case "start-options":
       return (
@@ -369,9 +271,7 @@ function blockSecondaryAction(
     case "stop-with-password":
       return (
         <Action.Push
-          title={
-            context.isDevice ? "Disable with Password…" : "Stop with Password…"
-          }
+          title={context.isDevice ? "Disable with Password…" : "Stop with Password…"}
           icon={Icon.Key}
           target={
             <StopPasswordForm
@@ -383,13 +283,7 @@ function blockSecondaryAction(
         />
       );
     case "diagnostics":
-      return (
-        <Action.Push
-          title="Open CLI Diagnostics"
-          icon={Icon.Terminal}
-          target={<CliDiagnosticsCommand />}
-        />
-      );
+      return <Action.Push title="Open CLI Diagnostics" icon={Icon.Terminal} target={<CliDiagnosticsCommand />} />;
   }
 }
 
@@ -407,13 +301,7 @@ function blockSearchKeywords(block: BlockInfo): string[] {
         ? ["device", "schedule", "lock screen", "sign out", "shut down"]
         : ["unknown type"];
 
-  return [
-    blockKindLabel(block.kind),
-    block.kind,
-    block.state,
-    statusPresentation(block.state).label,
-    ...kindKeywords,
-  ];
+  return [blockKindLabel(block.kind), block.kind, block.state, statusPresentation(block.state).label, ...kindKeywords];
 }
 
 function statusPresentation(state: BlockState): {

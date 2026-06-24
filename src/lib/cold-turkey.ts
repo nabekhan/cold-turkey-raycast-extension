@@ -22,8 +22,7 @@ const MAX_TIMEOUT_MS = 120_000;
 const MIN_COMMAND_GAP_MS = 40;
 
 const DEFAULT_EXECUTABLES = {
-  darwin:
-    "/Applications/Cold Turkey Blocker.app/Contents/MacOS/Cold Turkey Blocker",
+  darwin: "/Applications/Cold Turkey Blocker.app/Contents/MacOS/Cold Turkey Blocker",
   win32: "C:\\Program Files\\Cold Turkey\\Cold Turkey Blocker.exe",
 } as const;
 
@@ -90,10 +89,7 @@ export function getPreferences(): ExtensionPreferences {
 
 export function getExecutablePath(): string {
   const configured = getPreferences().executablePath?.trim();
-  const fallback =
-    process.platform === "darwin"
-      ? DEFAULT_EXECUTABLES.darwin
-      : DEFAULT_EXECUTABLES.win32;
+  const fallback = process.platform === "darwin" ? DEFAULT_EXECUTABLES.darwin : DEFAULT_EXECUTABLES.win32;
   return expandHome(stripMatchingQuotes(configured || fallback));
 }
 
@@ -125,8 +121,7 @@ export function getCliContext(): {
  */
 export function runColdTurkey(args: string[]): Promise<CliResult> {
   const run = cliQueue.then(async () => {
-    const remainingGap =
-      MIN_COMMAND_GAP_MS - (Date.now() - lastCommandFinishedAt);
+    const remainingGap = MIN_COMMAND_GAP_MS - (Date.now() - lastCommandFinishedAt);
     if (remainingGap > 0) await sleep(remainingGap);
 
     try {
@@ -167,34 +162,24 @@ export async function listBlocks(): Promise<BlockDescriptor[]> {
     return blocks;
   }
 
-  throw new ColdTurkeyCliError(
-    "Could not understand the output from -list-blocks.",
-    {
-      kind: "unparseable-output",
-      output: result.output,
-      executablePath: getExecutablePath(),
-    },
-  );
+  throw new ColdTurkeyCliError("Could not understand the output from -list-blocks.", {
+    kind: "unparseable-output",
+    output: result.output,
+    executablePath: getExecutablePath(),
+  });
 }
 
 export async function listBlockNames(): Promise<string[]> {
   return (await listBlocks()).map((block) => block.name);
 }
 
-export async function findBlock(
-  blockName: string,
-): Promise<BlockDescriptor | undefined> {
+export async function findBlock(blockName: string): Promise<BlockDescriptor | undefined> {
   const normalized = blockName.trim().toLocaleLowerCase();
-  return (await listBlocks()).find(
-    (block) => block.name.toLocaleLowerCase() === normalized,
-  );
+  return (await listBlocks()).find((block) => block.name.toLocaleLowerCase() === normalized);
 }
 
-export async function getBlockStatus(
-  block: string | BlockDescriptor,
-): Promise<BlockInfo> {
-  const descriptor: BlockDescriptor =
-    typeof block === "string" ? { name: block, kind: "unknown" } : block;
+export async function getBlockStatus(block: string | BlockDescriptor): Promise<BlockInfo> {
+  const descriptor: BlockDescriptor = typeof block === "string" ? { name: block, kind: "unknown" } : block;
   const result = await runColdTurkey(buildStatusArgs(descriptor.name));
   return {
     ...descriptor,
@@ -207,8 +192,7 @@ export async function getBlockStatusWithRetry(
   block: string | BlockDescriptor,
   options: { attempts?: number; initialDelayMs?: number } = {},
 ): Promise<BlockInfo> {
-  const descriptor: BlockDescriptor =
-    typeof block === "string" ? { name: block, kind: "unknown" } : block;
+  const descriptor: BlockDescriptor = typeof block === "string" ? { name: block, kind: "unknown" } : block;
   const attempts = Math.max(1, options.attempts ?? 3);
   const initialDelayMs = Math.max(0, options.initialDelayMs ?? 0);
   let last: BlockInfo = {
@@ -254,8 +238,7 @@ export async function waitForBlockState(
   expectedState: Exclude<BlockState, "unknown">,
   options: { attempts?: number; initialDelayMs?: number } = {},
 ): Promise<BlockInfo> {
-  const descriptor: BlockDescriptor =
-    typeof block === "string" ? { name: block, kind: "unknown" } : block;
+  const descriptor: BlockDescriptor = typeof block === "string" ? { name: block, kind: "unknown" } : block;
   const attempts = Math.max(1, options.attempts ?? 6);
   const initialDelayMs = Math.max(0, options.initialDelayMs ?? 120);
   let last: BlockInfo = {
@@ -269,18 +252,12 @@ export async function waitForBlockState(
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     last = await getBlockStatusWithRetry(descriptor, { attempts: 1 });
     if (last.state === expectedState) return last;
-    if (attempt < attempts - 1)
-      await sleep(Math.min(1_000, 120 * 2 ** attempt));
+    if (attempt < attempts - 1) await sleep(Math.min(1_000, 120 * 2 ** attempt));
   }
 
   const unknownDetail =
-    last.state === "unknown" && last.rawStatus
-      ? ` (${last.rawStatus.replace(/\s+/g, " ").trim()})`
-      : "";
-  const actual =
-    last.state === "unknown"
-      ? `could not be determined${unknownDetail}`
-      : `is still ${last.state}`;
+    last.state === "unknown" && last.rawStatus ? ` (${last.rawStatus.replace(/\s+/g, " ").trim()})` : "";
+  const actual = last.state === "unknown" ? `could not be determined${unknownDetail}` : `is still ${last.state}`;
   const lockHint =
     expectedState === "disabled" && last.state === "enabled"
       ? " The block may still be locked; use its password or satisfy the configured lock conditions."
@@ -299,8 +276,7 @@ export async function waitForKnownBlockState(
   block: string | BlockDescriptor,
   options: { attempts?: number; initialDelayMs?: number } = {},
 ): Promise<BlockInfo> {
-  const descriptor: BlockDescriptor =
-    typeof block === "string" ? { name: block, kind: "unknown" } : block;
+  const descriptor: BlockDescriptor = typeof block === "string" ? { name: block, kind: "unknown" } : block;
   const attempts = Math.max(1, options.attempts ?? 6);
   const initialDelayMs = Math.max(0, options.initialDelayMs ?? 120);
   let last: BlockInfo = {
@@ -314,13 +290,10 @@ export async function waitForKnownBlockState(
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     last = await getBlockStatusWithRetry(descriptor, { attempts: 1 });
     if (last.state !== "unknown") return last;
-    if (attempt < attempts - 1)
-      await sleep(Math.min(1_000, 120 * 2 ** attempt));
+    if (attempt < attempts - 1) await sleep(Math.min(1_000, 120 * 2 ** attempt));
   }
 
-  const detail = last.rawStatus
-    ? ` Last response: ${last.rawStatus.replace(/\s+/g, " ").trim()}`
-    : "";
+  const detail = last.rawStatus ? ` Last response: ${last.rawStatus.replace(/\s+/g, " ").trim()}` : "";
   throw new ColdTurkeyCliError(
     `Cold Turkey accepted the command, but the status of ${descriptor.name} is unknown.${detail}`,
     {
@@ -345,24 +318,13 @@ export async function waitForBlockPresence(
 
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     lastBlocks = await listBlocks();
-    const found = lastBlocks.find(
-      (block) => block.name.toLocaleLowerCase() === normalizedName,
-    );
-    if (
-      found &&
-      (expectedKind === "unknown" ||
-        found.kind === expectedKind ||
-        found.kind === "unknown")
-    )
-      return found;
-    if (attempt < attempts - 1)
-      await sleep(Math.min(1_000, 120 * 2 ** attempt));
+    const found = lastBlocks.find((block) => block.name.toLocaleLowerCase() === normalizedName);
+    if (found && (expectedKind === "unknown" || found.kind === expectedKind || found.kind === "unknown")) return found;
+    if (attempt < attempts - 1) await sleep(Math.min(1_000, 120 * 2 ** attempt));
   }
 
   const names = lastBlocks.map((block) => block.name).join(", ");
-  const detail = names
-    ? ` Blocks found: ${names}.`
-    : " No blocks were returned.";
+  const detail = names ? ` Blocks found: ${names}.` : " No blocks were returned.";
   throw new ColdTurkeyCliError(
     `Cold Turkey returned no error, but ${blockName} did not appear in the block list as a ${blockKindLabel(expectedKind)} block.${detail}`,
     {
@@ -397,23 +359,17 @@ async function executeColdTurkey(args: string[]): Promise<CliResult> {
       (error, stdout, stderr) => {
         const normalizedStdout = decodeCliOutput(stdout ?? Buffer.alloc(0));
         const normalizedStderr = decodeCliOutput(stderr ?? Buffer.alloc(0));
-        const output = [normalizedStdout, normalizedStderr]
-          .filter(Boolean)
-          .join("\n")
-          .trim();
+        const output = [normalizedStdout, normalizedStderr].filter(Boolean).join("\n").trim();
         const durationMs = Date.now() - startedAt;
 
         if (!error) {
           if (looksLikeCliError(output)) {
             reject(
-              new ColdTurkeyCliError(
-                extractCliError(output) ?? "Cold Turkey reported an error.",
-                {
-                  kind: "command-failed",
-                  executablePath,
-                  output,
-                },
-              ),
+              new ColdTurkeyCliError(extractCliError(output) ?? "Cold Turkey reported an error.", {
+                kind: "command-failed",
+                executablePath,
+                output,
+              }),
             );
             return;
           }
@@ -434,39 +390,29 @@ async function executeColdTurkey(args: string[]): Promise<CliResult> {
 
         if (processError.code === "ENOENT") {
           reject(
-            new ColdTurkeyCliError(
-              `Cold Turkey executable was not found at ${executablePath}.`,
-              {
-                kind: "missing-executable",
-                executablePath,
-                output,
-                cause: error,
-              },
-            ),
+            new ColdTurkeyCliError(`Cold Turkey executable was not found at ${executablePath}.`, {
+              kind: "missing-executable",
+              executablePath,
+              output,
+              cause: error,
+            }),
           );
           return;
         }
 
         if (processError.code === "EACCES" || processError.code === "EPERM") {
           reject(
-            new ColdTurkeyCliError(
-              `Raycast cannot execute Cold Turkey at ${executablePath}.`,
-              {
-                kind: "permission-denied",
-                executablePath,
-                output,
-                cause: error,
-              },
-            ),
+            new ColdTurkeyCliError(`Raycast cannot execute Cold Turkey at ${executablePath}.`, {
+              kind: "permission-denied",
+              executablePath,
+              output,
+              cause: error,
+            }),
           );
           return;
         }
 
-        if (
-          processError.killed ||
-          processError.signal === "SIGTERM" ||
-          processError.code === "ETIMEDOUT"
-        ) {
+        if (processError.killed || processError.signal === "SIGTERM" || processError.code === "ETIMEDOUT") {
           const windowsTip =
             process.platform === "win32"
               ? " Fully exit the Blocker interface from its system tray icon, then retry."
@@ -484,10 +430,7 @@ async function executeColdTurkey(args: string[]): Promise<CliResult> {
 
         reject(
           new ColdTurkeyCliError(
-            extractCliError(output) ||
-              output ||
-              error.message ||
-              "Cold Turkey CLI command failed.",
+            extractCliError(output) || output || error.message || "Cold Turkey CLI command failed.",
             {
               kind: "command-failed",
               executablePath,
@@ -504,39 +447,29 @@ async function executeColdTurkey(args: string[]): Promise<CliResult> {
 
 function assertSupportedPlatform(): void {
   if (process.platform === "darwin" || process.platform === "win32") return;
-  throw new ColdTurkeyCliError(
-    `Cold Turkey Blocker CLI is not supported on ${process.platform}.`,
-    {
-      kind: "unsupported-platform",
-    },
-  );
+  throw new ColdTurkeyCliError(`Cold Turkey Blocker CLI is not supported on ${process.platform}.`, {
+    kind: "unsupported-platform",
+  });
 }
 
 function assertExecutable(executablePath: string): void {
   if (!existsSync(executablePath)) {
-    throw new ColdTurkeyCliError(
-      `Cold Turkey executable was not found at ${executablePath}.`,
-      {
-        kind: "missing-executable",
-        executablePath,
-      },
-    );
+    throw new ColdTurkeyCliError(`Cold Turkey executable was not found at ${executablePath}.`, {
+      kind: "missing-executable",
+      executablePath,
+    });
   }
 
   try {
     const stat = statSync(executablePath);
     if (!stat.isFile()) throw new Error("Path is not a file.");
-    if (process.platform === "darwin")
-      accessSync(executablePath, constants.X_OK);
+    if (process.platform === "darwin") accessSync(executablePath, constants.X_OK);
   } catch (error) {
-    throw new ColdTurkeyCliError(
-      `Cold Turkey executable is not runnable at ${executablePath}.`,
-      {
-        kind: "permission-denied",
-        executablePath,
-        cause: error,
-      },
-    );
+    throw new ColdTurkeyCliError(`Cold Turkey executable is not runnable at ${executablePath}.`, {
+      kind: "permission-denied",
+      executablePath,
+      cause: error,
+    });
   }
 }
 
@@ -544,15 +477,12 @@ function stripMatchingQuotes(value: string): string {
   if (value.length < 2) return value;
   const first = value[0];
   const last = value[value.length - 1];
-  return (first === '"' && last === '"') || (first === "'" && last === "'")
-    ? value.slice(1, -1)
-    : value;
+  return (first === '"' && last === '"') || (first === "'" && last === "'") ? value.slice(1, -1) : value;
 }
 
 function expandHome(value: string): string {
   if (value === "~") return homedir();
-  if (value.startsWith("~/") || value.startsWith("~\\"))
-    return `${homedir()}${value.slice(1)}`;
+  if (value.startsWith("~/") || value.startsWith("~\\")) return `${homedir()}${value.slice(1)}`;
   return value;
 }
 
@@ -570,9 +500,7 @@ function hasOnlyBlockSectionHeadings(output: string): boolean {
   return (
     meaningful.length > 0 &&
     meaningful.every((line) =>
-      /^(?:website\s*(?:&|and)\s*app\s+blocks?|website\s+blocks?|device\s+blocks?)$/i.test(
-        line,
-      ),
+      /^(?:website\s*(?:&|and)\s*app\s+blocks?|website\s+blocks?|device\s+blocks?)$/i.test(line),
     )
   );
 }

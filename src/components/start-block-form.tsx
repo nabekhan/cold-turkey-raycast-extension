@@ -14,12 +14,7 @@ interface StartBlockFormProps {
   onSuccess?: () => void | Promise<void>;
 }
 
-export function StartBlockForm({
-  blockName,
-  blockKind,
-  initialMode = "as-is",
-  onSuccess,
-}: StartBlockFormProps) {
+export function StartBlockForm({ blockName, blockKind, initialMode = "as-is", onSuccess }: StartBlockFormProps) {
   const { pop } = useNavigation();
   const [mode, setMode] = useState<StartOptionMode>(initialMode);
   const [minutes, setMinutes] = useState("60");
@@ -35,26 +30,19 @@ export function StartBlockForm({
     const parsedMinutes = parseWholeNumber(minutes);
     const parsedRandomTextLength = parseWholeNumber(randomTextLength);
 
-    if (
-      mode === "timed" &&
-      (parsedMinutes === undefined || parsedMinutes < 1)
-    ) {
+    if (mode === "timed" && (parsedMinutes === undefined || parsedMinutes < 1)) {
       setMinutesError("Enter a whole number of at least 1 minute.");
       return;
     }
 
     if (mode === "password" && !isValidCliPassword(password)) {
-      setPasswordError(
-        "Use a non-empty password without spaces or quote characters.",
-      );
+      setPasswordError("Use a non-empty password without spaces or quote characters.");
       return;
     }
 
     if (
       mode === "random-text" &&
-      (parsedRandomTextLength === undefined ||
-        parsedRandomTextLength < 1 ||
-        parsedRandomTextLength > 999)
+      (parsedRandomTextLength === undefined || parsedRandomTextLength < 1 || parsedRandomTextLength > 999)
     ) {
       setRandomTextError("Enter a whole number between 1 and 999.");
       return;
@@ -64,12 +52,7 @@ export function StartBlockForm({
       mode === "unlocked" ||
       (await confirmPotentialLock(
         confirmationTitle(mode, blockName),
-        confirmationMessage(
-          mode,
-          blockKind,
-          parsedMinutes,
-          parsedRandomTextLength,
-        ),
+        confirmationMessage(mode, blockKind, parsedMinutes, parsedRandomTextLength),
       ));
     if (!confirmed) return;
 
@@ -83,10 +66,7 @@ export function StartBlockForm({
         randomTextLength: parsedRandomTextLength,
       }),
       workingTitle: `Starting ${blockName}…`,
-      successTitle:
-        blockKind === "device"
-          ? `Enabled ${blockName}`
-          : `Started ${blockName}`,
+      successTitle: blockKind === "device" ? `Enabled ${blockName}` : `Started ${blockName}`,
       verification: {
         type: "state",
         block: descriptor,
@@ -126,31 +106,11 @@ export function StartBlockForm({
         value={mode}
         onChange={(value) => setMode(value as StartOptionMode)}
       >
-        <Form.Dropdown.Item
-          value="unlocked"
-          title="Start Unlocked (No Lock)"
-          icon={Icon.LockUnlocked}
-        />
-        <Form.Dropdown.Item
-          value="as-is"
-          title="Use Saved Settings"
-          icon={Icon.ArrowClockwise}
-        />
-        <Form.Dropdown.Item
-          value="timed"
-          title="Timed Lock"
-          icon={Icon.Clock}
-        />
-        <Form.Dropdown.Item
-          value="password"
-          title="Password Lock"
-          icon={Icon.Key}
-        />
-        <Form.Dropdown.Item
-          value="random-text"
-          title="Random Text Lock"
-          icon={Icon.Text}
-        />
+        <Form.Dropdown.Item value="unlocked" title="Start Unlocked (No Lock)" icon={Icon.LockUnlocked} />
+        <Form.Dropdown.Item value="as-is" title="Use Saved Settings" icon={Icon.ArrowClockwise} />
+        <Form.Dropdown.Item value="timed" title="Timed Lock" icon={Icon.Clock} />
+        <Form.Dropdown.Item value="password" title="Password Lock" icon={Icon.Key} />
+        <Form.Dropdown.Item value="random-text" title="Random Text Lock" icon={Icon.Text} />
       </Form.Dropdown>
 
       {mode === "unlocked" ? (
@@ -250,12 +210,7 @@ function parseWholeNumber(value: string): number | undefined {
 }
 
 function isValidCliPassword(value: string): boolean {
-  return (
-    value.length > 0 &&
-    !/\s/.test(value) &&
-    !value.includes('"') &&
-    !value.includes("'")
-  );
+  return value.length > 0 && !/\s/.test(value) && !value.includes('"') && !value.includes("'");
 }
 
 function submitTitle(mode: StartOptionMode): string {
