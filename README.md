@@ -4,14 +4,13 @@ A cross-platform Raycast extension for controlling Cold Turkey Blocker from macO
 
 ## Commands
 
-- **Manage Blocks** — the single default command. It lists every block, checks status, and exposes start, stop, lock, website, creation, and break workflows contextually.
-- **CLI Diagnostics** — a disabled-by-default troubleshooting command that runs a safe, read-only report using only `-help`, `-list-blocks`, and sequential `-status` checks.
+- **Manage Cold Turkey** — the single command. It lists every block, checks status, launches Cold Turkey, and exposes start, stop, lock, website, creation, break, and diagnostic workflows contextually.
 
-The former **Start Block**, **Add to Block**, **Create Block**, and **Control Break** root commands were removed from the manifest because the same workflows are available from **Manage Blocks** with the selected block already filled in.
+The former **Start Block**, **Add to Block**, **Create Block**, **Control Break**, and **CLI Diagnostics** root commands are not in the manifest because the same workflows are available from **Manage Cold Turkey** with the selected block already filled in.
 
 ## Interaction model
 
-**Manage Blocks** is optimized around one selected block:
+**Manage Cold Turkey** is optimized around one selected block:
 
 - **Enter** explicitly **starts unlocked** (or enables a device schedule with no lock), attempts to stop an enabled block, or refreshes a block whose status is unknown. When Cold Turkey reports that stopping requires a password, the extension opens the password form automatically.
 - **Command–Enter** opens **Start Options** for a disabled block or read-only **CLI Diagnostics** when status is unknown. Enabled blocks no longer expose a separate password-stop action.
@@ -20,7 +19,8 @@ The former **Start Block**, **Add to Block**, **Create Block**, and **Control Br
 - **Control Break** is one form with a dropdown for starting or stopping the supported break workflows.
 - **Command–N** opens one creation form. Website & App blocks can include optional initial website/pattern and exception lists; leaving both blank creates an empty block. The CLI does not expose application-entry creation, so apps are still added in Cold Turkey itself. Device blocks remain definition-only at creation time.
 - **Command–R** refreshes blocks and statuses.
-- Raycast’s native search matches block names plus status and type keywords such as `enabled`, `disabled`, `website`, and `device`; the extra filter dropdown was removed. Root Search keywords such as `create`, `add`, `exception`, `password`, and `schedule` still lead to **Manage Blocks** after the standalone commands are removed.
+- **Open Cold Turkey** launches the configured app/executable directly from the command.
+- Raycast’s native search matches block names plus status and type keywords such as `enabled`, `disabled`, `website`, and `device`; the extra filter dropdown was removed. Root Search keywords such as `create`, `add`, `exception`, `password`, and `schedule` still lead to **Manage Cold Turkey** after the standalone commands are removed.
 - Unknown status is treated as a diagnostic state: the extension offers refresh and read-only diagnostics instead of guessing whether a mutating command should start or stop the block.
 
 The extension covers these CLI forms:
@@ -61,7 +61,7 @@ Cold Turkey mutation commands commonly return no text when successful. The exten
 
 `-status` reports only **Enabled** or **Disabled**. It does not reveal the lock type, remaining lock time, or whether a break workflow is active.
 
-For device blocks, a basic `-start` enables the configured schedule. It does not necessarily activate the lock-screen, sign-out, or shut-down action immediately. A timed `-lock` start may activate that action immediately.
+For device blocks, a basic `-start` enables the configured schedule. It may activate the lock-screen, sign-out, or shut-down action depending on Cold Turkey's configuration. A timed `-lock` start may also activate that action immediately.
 
 `-stop-random-text-break` controls a configured random-text **break**. It does not remove a random-text **block lock**.
 
@@ -105,7 +105,7 @@ Change **Cold Turkey Executable** in Raycast’s extension preferences when the 
 
 ## Safety and privacy
 
-Locking actions and `-as-is` starts ask for confirmation by default because a saved configuration can activate a lock or a device block. The confirmation can be disabled in extension preferences.
+Locking actions, `-as-is` starts, and device schedule starts ask for confirmation by default because they can activate a lock or a device block. The confirmation can be disabled in extension preferences.
 
 Passwords entered in forms are never saved by this extension. They are passed directly to the Cold Turkey process as command arguments, so they may be visible briefly to operating-system process-inspection tools while the command runs.
 
@@ -204,7 +204,7 @@ Available options:
   Override the harmless website/app test block name. Defaults to Raycast_Report_Test.
 
 --test-password "password"
-  Override the password used for optional password-lock testing. The value must avoid spaces and quotes.
+  Override the password used for optional password-lock testing.
 
 --test-device-block "Name"
   Override the standard test device-block name.

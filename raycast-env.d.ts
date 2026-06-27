@@ -22,14 +22,10 @@ declare type Preferences = ExtensionPreferences
 declare namespace Preferences {
   /** Preferences accessible in the `manage-blocks` command */
   export type ManageBlocks = ExtensionPreferences & {}
-  /** Preferences accessible in the `cli-diagnostics` command */
-  export type CliDiagnostics = ExtensionPreferences & {}
 }
 
 declare namespace Arguments {
   /** Arguments passed to the `manage-blocks` command */
   export type ManageBlocks = {}
-  /** Arguments passed to the `cli-diagnostics` command */
-  export type CliDiagnostics = {}
 }
 
