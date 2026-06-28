@@ -494,7 +494,7 @@ function hasOnlyBlockSectionHeadings(output: string): boolean {
   return (
     meaningful.length > 0 &&
     meaningful.every((line) =>
-      /^(?:website\s*(?:&|and)\s*app\s+blocks?|website\s+blocks?|device\s+blocks?|(?:.+\s+)?blocks)$/i.test(line),
+      /^(?:website\s*(?:&|and)\s*app\s+blocks?|website\s+blocks?|device\s+blocks?)$/i.test(line),
     )
   );
 }

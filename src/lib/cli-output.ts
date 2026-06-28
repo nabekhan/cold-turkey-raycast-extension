@@ -211,7 +211,6 @@ function parseSectionHeading(value: string): BlockKind | undefined {
     return "website-app";
   }
   if (/^device\s+blocks?$/i.test(heading)) return "device";
-  if (/^(?:.+\s+)?blocks$/i.test(heading)) return "unknown";
   return undefined;
 }
 

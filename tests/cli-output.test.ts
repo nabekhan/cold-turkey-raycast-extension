@@ -57,11 +57,12 @@ test("parses Cold Turkey 4.9 block sections without treating headings as blocks"
   ]);
 });
 
-test("treats unknown block-list headings as sections, not block names", () => {
-  assert.deepEqual(parseBlockList("Website & App Blocks\nDeep Work\nFuture Blocks\nMystery"), [
+test("keeps plural block names instead of treating them as headings", () => {
+  assert.deepEqual(parseBlockList("Website & App Blocks\nDeep Work\nStudy Blocks"), [
     { name: "Deep Work", kind: "website-app" },
-    { name: "Mystery", kind: "unknown" },
+    { name: "Study Blocks", kind: "website-app" },
   ]);
+  assert.deepEqual(parseBlockList("Study Blocks"), [{ name: "Study Blocks", kind: "unknown" }]);
   assert.deepEqual(parseBlockList("Deep Work Block"), [{ name: "Deep Work Block", kind: "unknown" }]);
 });
 
